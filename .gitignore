@@ -1,0 +1,21 @@
+.env
+workspaces/
+output/
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.idea/
+.vscode/
+.DS_Store
+*.log
+
+# build artifacts
+*.exe
+verify/demo*
+
+# private docs and screenshots
+*.pdf
+image*.png
+*_personal_backup.md
