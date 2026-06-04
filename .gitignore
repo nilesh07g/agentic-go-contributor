@@ -1,5 +1,6 @@
 .env
 workspaces/
+*__agent_demo/
 output/
 __pycache__/
 *.pyc

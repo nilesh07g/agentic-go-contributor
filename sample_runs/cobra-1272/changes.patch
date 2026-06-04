@@ -1,0 +1,35 @@
+diff --git a/command.go b/command.go
+index c05fed4..1e1211f 100644
+--- a/command.go
++++ b/command.go
+@@ -1346,17 +1346,19 @@ func (c *Command) AddCommand(cmds ...*Command) {
+ 		}
+ 		cmds[i].parent = c
+ 		// update max lengths
+-		usageLen := len(x.Use)
+-		if usageLen > c.commandsMaxUseLen {
+-			c.commandsMaxUseLen = usageLen
+-		}
+-		commandPathLen := len(x.CommandPath())
+-		if commandPathLen > c.commandsMaxCommandPathLen {
+-			c.commandsMaxCommandPathLen = commandPathLen
+-		}
+-		nameLen := len(x.Name())
+-		if nameLen > c.commandsMaxNameLen {
+-			c.commandsMaxNameLen = nameLen
++		if !x.Hidden {
++			usageLen := len(x.Use)
++			if usageLen > c.commandsMaxUseLen {
++				c.commandsMaxUseLen = usageLen
++			}
++			commandPathLen := len(x.CommandPath())
++			if commandPathLen > c.commandsMaxCommandPathLen {
++				c.commandsMaxCommandPathLen = commandPathLen
++			}
++			nameLen := len(x.Name())
++			if nameLen > c.commandsMaxNameLen {
++				c.commandsMaxNameLen = nameLen
++			}
+ 		}
+ 		// If global normalization function exists, update all children
+ 		if c.globNormFunc != nil {

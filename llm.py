@@ -12,7 +12,7 @@ from google.generativeai.types import content_types
 
 from tools.schemas import tool_declarations
 
-DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite")
 
 
 @dataclass
