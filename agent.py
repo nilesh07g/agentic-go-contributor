@@ -19,6 +19,7 @@ load_dotenv(ROOT / ".env")
 
 from github_client import fetch_issue
 from llm import GeminiAgent
+from tools import demo as demo_tools
 from tools import fs as fs_tools
 from tools import git as git_tools
 from tools import runner as run_tools
@@ -26,7 +27,7 @@ from tools import search as search_tools
 from workspace import ensure_repo, make_patch
 
 MAX_ITERATIONS = int(os.environ.get("MAX_AGENT_ITERATIONS", "15"))
-RATE_SLEEP_SEC = 13  # Gemini 2.5-flash free tier: 5 RPM; 13s = ~4.6 RPM (safe, retry handles spikes)
+RATE_SLEEP_SEC = 6  # Gemini 2.5-flash-lite free tier: 15-30 RPM; 6s = 10 RPM safe
 
 
 def build_dispatch(repo_dir: Path):
@@ -51,6 +52,12 @@ def build_dispatch(repo_dir: Path):
     def git_diff(args):
         return git_tools.git_diff(repo_dir)
 
+    def write_demo(args):
+        return demo_tools.write_demo(repo_dir, args["name"], args["content"])
+
+    def run_demo(args):
+        return demo_tools.run_demo(repo_dir, args["name"])
+
     def run_build(args):
         return run_tools.run_build(repo_dir)
 
@@ -63,6 +70,8 @@ def build_dispatch(repo_dir: Path):
         "grep": grep,
         "edit_file": edit_file,
         "git_diff": git_diff,
+        "write_demo": write_demo,
+        "run_demo": run_demo,
         "run_build": run_build,
         "run_tests": run_tests,
     }

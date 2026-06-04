@@ -72,6 +72,27 @@ def tool_declarations() -> list[FunctionDeclaration]:
             parameters=Schema(type=Type.OBJECT, properties={}),
         ),
         FunctionDeclaration(
+            name="write_demo",
+            description="Write a standalone Go program that exercises the buggy feature. Place demos in a sibling directory of the repo (not inside it). Use this to reproduce the bug visibly before editing, then to confirm the fix actually changes observable behavior. The demo's go.mod is auto-generated and links against the patched repo.",
+            parameters=Schema(
+                type=Type.OBJECT,
+                properties={
+                    "name": _str("Demo filename, e.g. 'repro.go' (must be [A-Za-z0-9_]+.go)"),
+                    "content": _str("Full Go source. Must be 'package main' with a 'func main()'. Import the target repo's packages directly."),
+                },
+                required=["name", "content"],
+            ),
+        ),
+        FunctionDeclaration(
+            name="run_demo",
+            description="Build and run a previously-written demo. Returns the program's combined stdout+stderr. Use to observe behavior before and after a fix; the diff between two runs is the strongest signal that the bug is actually solved.",
+            parameters=Schema(
+                type=Type.OBJECT,
+                properties={"name": _str("Demo filename previously passed to write_demo")},
+                required=["name"],
+            ),
+        ),
+        FunctionDeclaration(
             name="run_build",
             description="Run 'go build ./...' in the repo. Use after editing to confirm code compiles.",
             parameters=Schema(type=Type.OBJECT, properties={}),
