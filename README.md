@@ -233,8 +233,6 @@ These are observations from running the agent on real cobra issues. They're not 
 
 ## Limitations
 
-- **Single language.** Validation tools are Go-specific (`go build`, `go test`). Other languages need their own runner tool.
-- **Single repo per run.** The agent operates inside the cloned target repo only; no cross-repo refactoring.
 - **No model fallback.** If Gemini misunderstands the issue, the agent will likely fail rather than escalate. There is no second model to second-guess it.
 - **Free-tier rate limits.** Gemini's free tier allows ~5–20 requests/minute and a daily quota. The framework sleeps between calls and retries on 429s, but you can exhaust the daily quota with ~5–10 runs of a typical issue.
 - **No issue-triage step.** Vague or under-specified issues get attempted anyway. A real triage step (ask: is this scope clear? is it small? is it well-formed?) would reject 20% of issues before wasting compute.
