@@ -7,21 +7,15 @@ classes of incomplete fixes that build + existing tests would miss.
 from __future__ import annotations
 
 import re
-import subprocess
 from pathlib import Path
+
+from tools._proc import run_capture
 
 DEMO_DIR_NAME = "agent_demo"
 MAX_OUTPUT_CHARS = 4000
+TIDY_TIMEOUT = 120
 RUN_TIMEOUT = 60
 _SAFE_NAME = re.compile(r"^[A-Za-z0-9_]+\.go$")
-
-
-def _truncate(s: str, limit: int = MAX_OUTPUT_CHARS) -> str:
-    if len(s) <= limit:
-        return s
-    head = s[: limit // 2]
-    tail = s[-limit // 2 :]
-    return f"{head}\n... (truncated {len(s) - limit} chars) ...\n{tail}"
 
 
 def _demo_dir(repo_root: Path) -> Path:
@@ -84,26 +78,10 @@ def run_demo(repo_root: Path, name: str) -> str:
         return f"ERROR: demo not found: {name}. Call write_demo first."
 
     # `go mod tidy` so the demo picks up the repo's transitive deps.
-    tidy = subprocess.run(
-        ["go", "mod", "tidy"], cwd=ddir, capture_output=True, text=True, timeout=120
-    )
-    if tidy.returncode != 0:
-        return f"ERROR: go mod tidy failed:\n{_truncate(tidy.stdout + tidy.stderr)}"
+    tidy_code, tidy_out = run_capture(["go", "mod", "tidy"], ddir, TIDY_TIMEOUT, MAX_OUTPUT_CHARS)
+    if tidy_code != 0:
+        return f"ERROR: go mod tidy failed:\n{tidy_out}"
 
-    try:
-        r = subprocess.run(
-            ["go", "run", name],
-            cwd=ddir,
-            capture_output=True,
-            text=True,
-            timeout=RUN_TIMEOUT,
-            check=False,
-        )
-    except subprocess.TimeoutExpired:
-        return f"TIMEOUT after {RUN_TIMEOUT}s running demo {name}"
-    except FileNotFoundError as e:
-        return f"ERROR: go not found: {e}"
-
-    out = (r.stdout or "") + (r.stderr or "")
-    status = "OK" if r.returncode == 0 else f"EXIT {r.returncode}"
-    return f"DEMO {status}:\n{_truncate(out)}"
+    code, out = run_capture(["go", "run", name], ddir, RUN_TIMEOUT, MAX_OUTPUT_CHARS)
+    status = "OK" if code == 0 else f"EXIT {code}"
+    return f"DEMO {status}:\n{out}"

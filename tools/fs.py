@@ -3,23 +3,16 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from tools._paths import resolve
+
 MAX_LIST_ENTRIES = 100
 DEFAULT_READ_LINES = 200
 LARGE_EDIT_LINES = 30
 LARGE_EXPANSION_RATIO = 3.0
 
 
-def _resolve(repo_root: Path, rel_path: str) -> Path:
-    rel = (rel_path or ".").lstrip("/\\")
-    p = (repo_root / rel).resolve()
-    root = repo_root.resolve()
-    if root != p and root not in p.parents:
-        raise ValueError(f"path escapes repo root: {rel_path}")
-    return p
-
-
 def list_dir(repo_root: Path, path: str = ".") -> str:
-    target = _resolve(repo_root, path)
+    target = resolve(repo_root, path)
     if not target.exists():
         return f"ERROR: path does not exist: {path}"
     if not target.is_dir():
@@ -39,7 +32,7 @@ def list_dir(repo_root: Path, path: str = ".") -> str:
 
 
 def read_file(repo_root: Path, path: str, line_start: int = 1, line_end: int | None = None) -> str:
-    target = _resolve(repo_root, path)
+    target = resolve(repo_root, path)
     if not target.exists():
         return f"ERROR: file does not exist: {path}"
     if not target.is_file():
@@ -69,7 +62,7 @@ def read_file(repo_root: Path, path: str, line_start: int = 1, line_end: int | N
 
 
 def edit_file(repo_root: Path, path: str, old_str: str, new_str: str) -> str:
-    target = _resolve(repo_root, path)
+    target = resolve(repo_root, path)
     if not target.exists():
         return f"ERROR: file does not exist: {path}"
     if not target.is_file():
