@@ -4,6 +4,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from tools._paths import resolve
+
 MAX_MATCHES = 50
 SKIP_DIRS = {".git", "vendor", "node_modules", ".idea", ".vscode"}
 TEXT_EXTENSIONS = {".go", ".md", ".mod", ".sum", ".yaml", ".yml", ".txt", ".json", ".toml"}
@@ -15,11 +17,10 @@ def grep(repo_root: Path, pattern: str, path: str = ".") -> str:
     except re.error as e:
         return f"ERROR: invalid regex {pattern!r}: {e}"
 
-    rel = (path or ".").lstrip("/\\")
-    start = (repo_root / rel).resolve()
-    root = repo_root.resolve()
-    if root != start and root not in start.parents:
-        return f"ERROR: path escapes repo root: {path}"
+    try:
+        start = resolve(repo_root, path)
+    except ValueError as e:
+        return f"ERROR: {e}"
     if not start.exists():
         return f"ERROR: path does not exist: {path}"
 

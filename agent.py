@@ -27,7 +27,7 @@ from tools import search as search_tools
 from workspace import ensure_repo, make_patch
 
 MAX_ITERATIONS = int(os.environ.get("MAX_AGENT_ITERATIONS", "15"))
-RATE_SLEEP_SEC = 6  # Gemini 2.5-flash-lite free tier: 15-30 RPM; 6s = 10 RPM safe
+RATE_SLEEP_SEC = 13  # Gemini 2.5-flash free tier: 5 RPM; 13s = ~4.6 RPM (safe; retry handles spikes)
 
 
 def build_dispatch(repo_dir: Path):
